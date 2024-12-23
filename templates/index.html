@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>치과보험청구사 AI</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Helvetica', 'Arial', sans-serif;
+        background: #f3eafc; /* 연한 보라색 배경 */
+        display: flex;
+        justify-content: center;
+    }
+
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        max-width: 600px;
+        width: 100%;
+        height: 100vh;
+        background: #ffffff;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    /* 상단 헤더 바 */
+    .header {
+        display: flex;
+        align-items: center;
+        background: #9b59b6;
+        color: #fff;
+        padding: 10px;
+    }
+
+    .header img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+        background: #fff;
+    }
+
+    .header h1 {
+        font-size: 18px;
+        margin: 0;
+    }
+
+    /* 채팅 영역 */
+    .chat-window {
+        flex: 1;
+        overflow-y: auto;
+        background: #f3eafc;
+        padding: 20px;
+    }
+
+    .message {
+        margin-bottom: 20px;
+        max-width: 80%;
+        line-height: 1.4;
+        word-wrap: break-word;
+        padding: 10px 15px;
+        border-radius: 10px;
+        position: relative;
+        display: inline-block;
+        font-size: 14px;
+    }
+
+    /* 사용자 메시지 (오른쪽 정렬, 보라색 계열) */
+    .message.user {
+        background: #d2b8f9;
+        color: #000;
+        margin-left: auto;
+        border-bottom-right-radius: 0;
+    }
+
+    /* 봇 메시지 (왼쪽 정렬, 연한 톤) */
+    .message.bot {
+        background: #fff;
+        color: #000;
+        border: 1px solid #ccc;
+        border-bottom-left-radius: 0;
+    }
+
+    /* 입력창 영역 */
+    .input-area {
+        display: flex;
+        border-top: 1px solid #ddd;
+    }
+
+    .input-area input {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        font-size: 14px;
+    }
+
+    .input-area button {
+        padding: 10px 20px;
+        border: none;
+        background: #9b59b6;
+        color: #fff;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.3s;
+    }
+
+    .input-area button:hover {
+        background: #8e44ad;
+    }
+
+    /* 스크롤바 스타일 */
+    .chat-window::-webkit-scrollbar {
+        width: 6px;
+    }
+    .chat-window::-webkit-scrollbar-track {
+        background: #f3eafc;
+    }
+    .chat-window::-webkit-scrollbar-thumb {
+        background: #d2b8f9;
+        border-radius: 3px;
+    }
+
+    /* 반응형 */
+    @media (max-width: 600px) {
+        .chat-container {
+            border-radius: 0;
+        }
+        .header h1 {
+            font-size: 16px;
+        }
+    }
+</style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="header">
+            <!-- 프로필 아이콘(임시) -->
+            <img src="data:image/svg+xml,%3Csvg%20width%3D%2240px%22%20height%3D%2240px%22%20viewBox%3D%220%200%2040%2040%22%20xmlns%3D'http://www.w3.org/2000/svg'%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2220%22%20r%3D%2218%22%20fill%3D%22%23ffffff%22%2F%3E%3Ctext%20x%3D%2212%22%20y%3D%2225%22%20font-size%3D%2214%22%20fill%3D%22%239b59b6%22%3EAI%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Profile">
+            <h1>치과보험청구사 AI</h1>
+        </div>
+        <div class="chat-window" id="chat-window">
+            <!-- 메시지가 여기 쌓임 -->
+        </div>
+        <form class="input-area" id="query-form">
+            <input type="text" name="query" id="query-input" placeholder="질문을 입력하세요.">
+            <button type="submit">전송</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('query-form');
+        const input = document.getElementById('query-input');
+        const chatWindow = document.getElementById('chat-window');
+
+        // 메시지 추가 함수
+        function addMessage(content, role) {
+            const msg = document.createElement('div');
+            msg.classList.add('message', role);
+            msg.textContent = content;
+            chatWindow.appendChild(msg);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const query = input.value.trim();
+            if (!query) return;
+
+            // 사용자의 메시지 표시
+            addMessage(query, 'user');
+            input.value = '';
+
+            // 서버에 질의
+            const response = await fetch('/query', {
+                method: 'POST',
+                body: new URLSearchParams({ query })
+            });
+            const data = await response.json();
+
+            // 봇의 메시지 표시
+            addMessage(data.answer, 'bot');
+        });
+    </script>
+</body>
+</html>

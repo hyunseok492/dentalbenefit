@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <title>치과보험청구사 AI 플로팅 채팅</title>
+  <style>
+    /* 전체 body 스타일 */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background-color: #f4f4f4;
+      height: 2000px; /* 데모용으로 길게 */
+    }
+
+    /* 플로팅 버튼 */
+    #chat-floating-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: #9b59b6;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    #chat-floating-btn:hover {
+      background-color: #8e44ad;
+    }
+
+    /* 채팅창 (처음엔 숨김 상태) */
+    #chat-popup {
+      position: fixed;
+      bottom: 90px; /* 플로팅 버튼 위 */
+      right: 20px;
+      width: 300px;
+      max-height: 400px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      display: none; /* 초기 상태: 숨김 */
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 9999;
+    }
+
+    /* 채팅창 헤더 */
+    #chat-popup-header {
+      background-color: #9b59b6;
+      padding: 10px;
+      color: #fff;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #chat-popup-header .close-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    /* 채팅창 메시지 영역 */
+    #chat-popup-messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      background: #f5f5f5;
+    }
+
+    /* 입력 영역 */
+    #chat-popup-input {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+    #chat-popup-input input {
+      flex: 1;
+      border: none;
+      padding: 10px;
+      font-size: 14px;
+    }
+    #chat-popup-input button {
+      background-color: #9b59b6;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    #chat-popup-input button:hover {
+      background-color: #8e44ad;
+    }
+
+    /* 채팅 버블 스타일 (사용자/봇 구분) */
+    .message {
+      margin: 5px 0;
+      max-width: 80%;
+      line-height: 1.3;
+      padding: 8px 12px;
+      border-radius: 10px;
+      word-wrap: break-word;
+      font-size: 13px;
+    }
+    .message.user {
+      background-color: #dcd0f7; /* 연한 보라 */
+      margin-left: auto;
+      margin-right: 0;
+      border-bottom-right-radius: 0;
+    }
+    .message.bot {
+      background-color: #ffffff;
+      margin-left: 0;
+      margin-right: auto;
+      border-bottom-left-radius: 0;
+      border: 1px solid #ccc;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- 플로팅 버튼 -->
+  <button id="chat-floating-btn">채팅</button>
+
+  <!-- 채팅 팝업 -->
+  <div id="chat-popup">
+    <div id="chat-popup-header">
+      치과보험청구사 AI
+      <button class="close-btn" id="close-chat-btn">X</button>
+    </div>
+    <div id="chat-popup-messages"></div>
+    <form id="chat-popup-input">
+      <input type="text" id="chat-input-text" placeholder="질문을 입력하세요." />
+      <button type="submit">전송</button>
+    </form>
+  </div>
+
+  <script>
+    const chatBtn = document.getElementById('chat-floating-btn');
+    const chatPopup = document.getElementById('chat-popup');
+    const closeChatBtn = document.getElementById('close-chat-btn');
+
+    const messageContainer = document.getElementById('chat-popup-messages');
+    const form = document.getElementById('chat-popup-input');
+    const inputText = document.getElementById('chat-input-text');
+
+    // 플로팅 버튼 클릭 -> 채팅창 열기/닫기
+    chatBtn.addEventListener('click', () => {
+      if (chatPopup.style.display === 'none' || chatPopup.style.display === '') {
+        chatPopup.style.display = 'flex'; // 채팅창 열기
+      } else {
+        chatPopup.style.display = 'none'; // 채팅창 닫기
+      }
+    });
+
+    // X 버튼 클릭 -> 채팅창 닫기
+    closeChatBtn.addEventListener('click', () => {
+      chatPopup.style.display = 'none';
+    });
+
+    // 메시지를 채팅창에 추가하는 함수
+    function addMessage(content, role) {
+      const msg = document.createElement('div');
+      msg.classList.add('message', role);
+      msg.textContent = content;
+      messageContainer.appendChild(msg);
+      messageContainer.scrollTop = messageContainer.scrollHeight;
+    }
+
+    // 폼 전송 -> 서버에 질문 보내기
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const query = inputText.value.trim();
+      if (!query) return;
+
+      // 사용자 메시지 표시
+      addMessage(query, 'user');
+      inputText.value = '';
+
+      try {
+        // 서버에 질의
+        const response = await fetch('/query', {
+          method: 'POST',
+          body: new URLSearchParams({ query })
+        });
+        const data = await response.json();
+
+        // 봇 메시지 표시
+        addMessage(data.answer, 'bot');
+      } catch (error) {
+        addMessage('에러가 발생했습니다. 잠시 후 다시 시도하세요.', 'bot');
+      }
+    });
+  </script>
+</body>
+</html>
