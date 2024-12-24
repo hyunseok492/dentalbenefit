@@ -35,7 +35,7 @@ def load_all_documents(pdf_dir, doc_dir):
             docs.append({"filename": doc_file, "text": text})
     return docs
 
-def chunk_text(text, chunk_size=1000, overlap=100):
+def chunk_text(text, chunk_size=1000, overlap=30):
     chunks = []
     start = 0
     text_length = len(text)
