@@ -23,7 +23,7 @@ def generate_answer(query, docs):
             {"role": "system", "content": "당신은 전문 치과보험청구사입니다."},
             {"role": "user", "content": prompt}
         ]
-          temperature=0.5,  # 표현 다양성 
+          temperature=0.5  # 표현 다양성 
         top_p=0.9         # nucleus sampling
     )
     return response.choices[0].message.content.strip()
