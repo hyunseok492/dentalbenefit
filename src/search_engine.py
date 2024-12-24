@@ -14,11 +14,11 @@ class SearchEngine:
         texts = [d["text"] for d in docs]
        from sklearn.feature_extraction.text import TfidfVectorizer
 
-self.vectorizer = TfidfVectorizer() .fit(texts)
+self.vectorizer = TfidfVectorizer().fit(texts)
         self.tfidf_matrix = self.vectorizer.transform(texts)
         self.metadata = docs
 
-    def search(self, query, top_k=2.5, min_score=0.3):
+    def search(self, query, top_k=2, min_score=0.3):
         query_vec = self.vectorizer.transform([query])
         scores = (self.tfidf_matrix * query_vec.T).toarray().ravel()
         top_indices = np.argsort(scores)[::-1][:top_k]
