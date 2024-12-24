@@ -12,9 +12,13 @@ class SearchEngine:
     def fit(self, docs):
         # docs: [{"filename": ..., "chunk_index": ..., "text": ...}, ...]
         texts = [d["text"] for d in docs]
-       from sklearn.feature_extraction.text import TfidfVectorizer
 
-self.vectorizer = TfidfVectorizer().fit(texts)
+self.vectorizer = TfidfVectorizer(
+    # 검색 시 불필요한 단어를 걸러내는 최소/최대 문서 빈도
+    min_df=2,   # 2개 이하의 문서에서만 등장하는 단어는 무시
+    max_df=0.8, # 전체 문서의 80% 이상에서 등장하는 단어는 무시
+    # ngram_range=(1,2), etc.
+).fit(texts)
         self.tfidf_matrix = self.vectorizer.transform(texts)
         self.metadata = docs
 
