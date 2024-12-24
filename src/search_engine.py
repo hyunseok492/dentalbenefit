@@ -18,7 +18,7 @@ self.vectorizer = TfidfVectorizer(
     min_df=2,   # 2개 이하의 문서에서만 등장하는 단어는 무시
     max_df=0.8, # 전체 문서의 80% 이상에서 등장하는 단어는 무시
     # ngram_range=(1,2), etc.
-).fit(texts)
+    ).fit(texts)
         self.tfidf_matrix = self.vectorizer.transform(texts)
         self.metadata = docs
 
