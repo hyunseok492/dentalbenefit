@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: dental-api
+    env: python
+    runtime: python3
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "./start.sh"
+    envVars:
+      - key: OPENAI_API_KEY
+        value: "YOUR_OPENAI_API_KEY"  # Render 대시보드에서 설정한 환경변수를 덮어씌우지 않으면 그대로 유지
+      - key: XML_API_KEY
+         value: "YOUR_OPENAI_XML_API_KEY"  # Render 대시보드에서 설정한 환경변수를 덮어씌우지 않으면 그대로 유지
