@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import os
-from search_engine import SearchEngine
-from query_engine import generate_answer
+from src.search_engine import SearchEngine
+from src.query_engine import generate_answer
 
 app = Flask(__name__)
 
